@@ -18,6 +18,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.escuelaing.arep.config.ServerConfig;
+
 /**
  * HTTP Server that handles multiple sequential requests and serves static
  * files. Supports HTML, CSS, JavaScript, images, and simple REST API endpoints.
@@ -28,9 +30,7 @@ import java.util.logging.Logger;
 public class HttpServer {
 
     private static boolean running = true;
-    private static final int PORT = 35000;
-    private static final String STATIC_FILES_DIR = "src/main/resources/static";
-    private static final String WEB_ROOT = System.getProperty("user.dir") + "/" + STATIC_FILES_DIR;
+    private static final String WEB_ROOT = System.getProperty("user.dir") + "/" + ServerConfig.STATIC_FILES_DIR;
     private static final Logger LOGGER = Logger.getLogger(HttpServer.class.getName());
 
     private static final Map<String, byte[]> fileCache = new HashMap<>();
@@ -64,10 +64,10 @@ public class HttpServer {
      *                     socket.
      */
     public void start() throws IOException {
-        try (ServerSocket serverSocket = new ServerSocket(PORT)) {
-            LOGGER.log(Level.INFO, "HTTP Server started on port {0}", PORT);
+        try (ServerSocket serverSocket = new ServerSocket(ServerConfig.PORT)) {
+            LOGGER.log(Level.INFO, "HTTP Server started on port {0}", ServerConfig.PORT);
             LOGGER.log(Level.INFO, "Serving files from: {0}", WEB_ROOT);
-            LOGGER.log(Level.INFO, "Open http://localhost:{0} in your browser", PORT);
+            LOGGER.log(Level.INFO, "Open http://localhost:{0} in your browser", ServerConfig.PORT);
 
             while (running) {
                 LOGGER.log(Level.INFO, "Waiting for client connection...");
@@ -79,7 +79,7 @@ public class HttpServer {
                 }
             }
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Could not start server on port: {0}", PORT);
+            LOGGER.log(Level.SEVERE, "Could not start server on port: {0}", ServerConfig.PORT);
             LOGGER.log(Level.SEVERE, "Error: {0}", e.getMessage());
         } finally {
             LOGGER.log(Level.INFO, "Server stopped.");
