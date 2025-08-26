@@ -30,7 +30,7 @@ import com.escuelaing.arep.config.ServerConfig;
 public class HttpServer {
 
     private static boolean running = true;
-    private static final String WEB_ROOT = System.getProperty("user.dir") + "/" + ServerConfig.STATIC_FILES_DIR;
+    private static String WEB_ROOT = System.getProperty("user.dir") + "/target/classes/" + ServerConfig.STATIC_FILES_DIR;
     private static final Logger LOGGER = Logger.getLogger(HttpServer.class.getName());
 
     private static final Map<String, byte[]> fileCache = new HashMap<>();
@@ -43,6 +43,9 @@ public class HttpServer {
      * @throws IOException if an I/O error occurs when starting the server.
      */
     public static void main(String[] args) throws IOException {
+        if(args.length > 0) {
+            WEB_ROOT = System.getProperty("user.dir") + "/" + args[0];
+        }
         HttpServer server = new HttpServer();
         server.start();
     }
@@ -96,6 +99,22 @@ public class HttpServer {
     }
 
     /**
+     * Updates the static files directory path.
+     * This method is called by the framework to set a custom static files location.
+     * 
+     * @param directory the new static files directory path
+     */
+    public static void setStaticFilesDirectory(String directory) {
+        if (directory.startsWith("/")) {
+            // For resources in classpath, use target/classes
+            WEB_ROOT = System.getProperty("user.dir") + "/target/classes" + directory;
+        } else {
+            WEB_ROOT = System.getProperty("user.dir") + "/" + directory;
+        }
+        LOGGER.log(Level.INFO, "Static files directory updated to: {0}", WEB_ROOT);
+    }
+
+    /**
      * Handles an incoming HTTP request from a client socket.
      * <p>
      * Reads the request line and headers, logs the request, and determines how
@@ -141,12 +160,47 @@ public class HttpServer {
         String method = requestParts[0];
         String path = requestParts[1];
 
-        if (path.startsWith("/api/")) {
+        // First check if this is a framework route
+        RouteHandler handler = WebApp.getRoute(path);
+        if (handler != null) {
+            handleFrameworkRoute(out, method, path, headers, handler);
+        } else if (path.startsWith("/api/")) {
             handleApiRequest(out, method, path);
         } else if (path.equals("/") || path.isEmpty()) {
             serveFile(out, "/index.html");
         } else {
             serveFile(out, path);
+        }
+    }
+
+    /**
+     * Handles framework routes using the registered RouteHandler.
+     * Creates Request and Response objects and delegates to the route handler.
+     * 
+     * @param out the OutputStream to write the response to
+     * @param method the HTTP method of the request
+     * @param path the request path with query parameters
+     * @param headers the request headers
+     * @param handler the RouteHandler for this route
+     * @throws IOException if an I/O error occurs while handling the request
+     */
+    private void handleFrameworkRoute(OutputStream out, String method, String path, 
+                                    Map<String, String> headers, RouteHandler handler) throws IOException {
+        try {
+            Request request = new Request(method, path, headers);
+            Response response = new Response();
+            
+            String result = handler.handle(request, response);
+            
+            // Send the response with the content type from the Response object
+            sendResponse(out, response.getStatusCode(), response.getContentType(), 
+                        result.getBytes(StandardCharsets.UTF_8));
+            
+            LOGGER.log(Level.INFO, "Framework route handled: {0}", path);
+            
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error handling framework route: {0}", e.getMessage());
+            sendErrorResponse(out, 500, "Internal Server Error");
         }
     }
 
