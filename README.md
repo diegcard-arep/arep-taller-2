@@ -55,8 +55,8 @@ Arep_Taller_1/
 1. **Clone and compile**:
 
 ```bash
-git clone https://github.com/diegcard/Arep_Taller_1.git
-cd Arep_Taller_1
+git clone https://github.com/diegcard-arep/arep-taller-2.git
+cd arep-taller-2
 mvn clean compile
 ```
 
@@ -64,11 +64,11 @@ mvn clean compile
 
 ```bash
 # Recommended option
-mvn exec:java -Dexec.mainClass="com.escuelaing.arep.HttpServer"
+mvn exec:java -Dexec.mainClass="com.escuelaing.arep.RestApiDemo"
 
 # Alternatives
-java -cp target/classes com.escuelaing.arep.HttpServer
-java -cp target/urlobject-1.0-SNAPSHOT.jar com.escuelaing.arep.HttpServer
+java -cp target/classes com.escuelaing.arep.RestApiDemo
+java -cp target/urlobject-1.0-SNAPSHOT.jar com.escuelaing.arep.RestApiDemo
 ```
 
 3. **Access the application**:
