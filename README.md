@@ -1,46 +1,73 @@
-# HTTP Server - AREP Workshop 1
+# 🌐 WebApp Framework - HTTP Server with Web Framework
 
-An HTTP web server implemented from scratch in pure Java, without external frameworks. It supports static files, REST services, and handling multiple MIME types.
+A complete HTTP server implemented from scratch in Java, with an integrated web framework that supports REST routes, static files, and multiple MIME types. The project includes both a low-level HTTP server and a high-level web framework for rapid application development.
 
-## 🎯 Features
+## 🎯 Key Features
 
-- ✅ Complete HTTP server with no external dependencies
-- ✅ Support for static files (HTML, CSS, JS, images)
-- ✅ REST API with mock endpoints
-- ✅ In-memory file cache
+### Core HTTP Server
+- ✅ Full-featured HTTP server with no external dependencies
+- ✅ Support for static files (HTML, CSS, JS, images, fonts)
+- ✅ In-memory file caching for improved performance
 - ✅ Automatic MIME type detection
-- ✅ Demo web application
+- ✅ Integrated error handling and logging
 
-## 🏗️ Architecture
+### Web Framework
+- ✅ Spark/Express-like web framework for Java
+- ✅ Route definition with lambda functions
+- ✅ Automatic query parameter handling
+- ✅ Customizable JSON responses and content types
+- ✅ Simplified static file configuration
+
+### Containerization and Deployment
+- ✅ Full Docker support
+- ✅ Optimized multi-stage Dockerfile
+- ✅ Docker Compose for development
+- ✅ Standalone executable JAR
+
+## 🏗️ System Architecture
 
 ![Architecture Diagram](img/diagram.png)
 
-### Main Class
+### Main Components
 
-- **HttpServer** (`src/main/java/com/escuelaing/arep/HttpServer.java`): Main server that handles connections, routing, MIME types, and REST services
+| Component | File | Description |
+|------------|----------|-------------|
+| **HttpServer** | `HttpServer.java` | Base HTTP server that handles connections, routing, and MIME types |
+| **WebApp Framework** | `WebApp.java` | High-level web framework for defining routes and services |
+| **Request/Response** | `Request.java`, `Response.java` | HTTP encapsulation objects |
+| **Demo Application** | `RestApiDemo.java` | Framework demo application |
+| **Configuration** | `ServerConfig.java` | Centralized server configuration |
 
-## 📄 Project Structure
+## Project Structure
 
 ```
-Arep_Taller_1/
+arep-taller-2/
 ├── src/
-│   ├── main/
-│   │   ├── java/com/escuelaing/arep/
-│   │   │   └── HttpServer.java          # Main server implementation
-│   │   └── resources/
-│   │       └── static/                  # Static web files
-│   │           ├── index.html          # Main page
-│   │           ├── styles.css          # Styles
-│   │           ├── app.js              # Client-side logic
-│   │           └── logo.svg            # Application logo
-│   └── test/
-│       └── java/com/escuelaing/arep/
-│           └── HttpServerTest.java      # Unit tests
-├── target/                              # Maven build output
-├── pom.xml                             # Maven configuration
-├── README.md                           # This file
-├── LICENSE.md                          # MIT License
-└── diagram.png                         # Architecture diagram
+│ ├── main/
+│ │ ├── java/com/escuelaing/arep/
+│ │ │ ├── HttpServer.java # Main HTTP Server
+│ │ │ ├── WebApp.java # Web Framework
+│ │ │ ├── Request.java # HTTP Request Object
+│ │ │ ├── Response.java # HTTP Response Object
+│ │ │ ├── RouteHandler.java # Interface for handlers
+│ │ │ ├── RestApiDemo.java # Demo application
+│ │ │ └── config/
+│ │ │ └── ServerConfig.java # Server configuration
+│ │ └── resources/
+│ │ └── static/ # Static web files
+│ │ ├── index.html # Home page
+│ │ ├── styles.css # CSS styles
+│ │ ├── app.js # Client-side logic
+│ │ └── logo.svg # App logo
+│ └── test/
+│ └── java/com/escuelaing/arep/
+│ └── HttpServerTest.java # Unit tests
+├── target/ # Maven output
+├── Dockerfile # Docker configuration
+├── docker-compose.yml # Compose for development
+├── pom.xml # Maven configuration
+├── README.md # This file
+└── LICENSE.md # MIT License
 ```
 
 ## 🚀 Quick Start
@@ -49,21 +76,21 @@ Arep_Taller_1/
 
 - Java 21+
 - Maven 3.6+
+- Docker (optional for containerization)
 
-### Installation and Running
+### Installation Methods and Execution
 
-1. **Clone and compile**:
+#### Option 1: Direct Execution with Maven
 
 ```bash
+# Clone and compile
 git clone https://github.com/diegcard-arep/arep-taller-2.git
 cd arep-taller-2
 mvn clean compile
 ```
 
-2. **Run server**:
-
 ```bash
-# Recommended option
+# Run server (recommended)
 mvn exec:java -Dexec.mainClass="com.escuelaing.arep.RestApiDemo"
 
 # Alternatives
@@ -71,22 +98,78 @@ java -cp target/classes com.escuelaing.arep.RestApiDemo
 java -cp target/urlobject-1.0-SNAPSHOT.jar com.escuelaing.arep.RestApiDemo
 ```
 
-3. **Access the application**:
+#### Option 2: Using Docker
 
+```bash
+# Build and run with Docker Compose
+docker-compose up --build
+
+# Or manually
+docker build -t arep-taller-2 .
+docker run -p 35000:35000 arep-taller-2
 ```
+
+#### Option 3: Executable JAR
+
+```bash
+# Build JAR
+mvn clean package
+
+# Run JAR
+java -jar target/urlobject-1.0-SNAPSHOT.jar
+```
+
+### Accessing the Application
+
+```text
 http://localhost:35000
 ```
 
+### Stopping the Server
 
-4. ### Stopping the Server
 - Press `Ctrl+C` in the terminal
-- The server will log shutdown information and close gracefully
+- The server will log shutdown information and shut down gracefully
 
-## 🌐 API and Features
+## 🔧 Using the Framework
+
+### Basic Example
+
+```java
+import static com.escuelaing.arep.WebApp.*;
+
+public class MyApplication { 
+public static void main(String[] args) { 
+// Configure static files 
+staticfiles("/static"); 
+
+// Define REST routes 
+get("/hello", (req, resp) -> { 
+String name = req.getValues("name"); 
+return "Hello " + (name.isEmpty() ? "World" : name) + "!"; 
+}); 
+
+get("/api/data", (req, resp) -> { 
+resp.type("application/json"); 
+return "{\"message\": \"Hello from API\"}"; 
+}); 
+
+// Start server 
+start(); 
+}
+}
+```
+### Framework Features
+
+- **Simple Routes**: Define routes with lambda functions
+- **Query Parameters**: Easily access them with `req.getValues("param")`
+- **Content Types**: Configure responses with `resp.type("mime-type")`
+- **Static Files**: Configure them with `staticfiles("/path")`
+
+## 🌐 API and Endpoints
 
 ### Static Files
 
-Supports multiple File types with automatic MIME detection:
+Support for multiple file types with automatic MIME detection:
 
 | Type | Extensions | Content-Type |
 |------|-------------|--------------|
@@ -97,23 +180,25 @@ Supports multiple File types with automatic MIME detection:
 | Fonts | .woff, .woff2, .ttf, .eot | font/* |
 | Documents | .pdf, .txt, .zip | application/* |
 
-### REST Endpoints
+### Demo REST Endpoints
 
 | Endpoint | Method | Description | Example |
 |----------|--------|-------------|---------|
-| `/api/hello` | GET | Custom greeting | `/api/hello?name=Diego` |
-| `/api/weather` | GET | Simulated Bogotá weather | JSON response with temperature |
-| `/api/quote` | GET | Random inspirational quote | JSON response with quote |
+| `/App/hello` | GET | Custom greeting | `/App/hello?name=Diego` |
+| `/App/pi` | GET | PI value | Numeric response |
+| `/App/greet` | GET | Multi-language greeting | `/App/greet?name=Maria&lang=es` |
+| `/App/info` | GET | Framework information | JSON response |
 
 ### Server Configuration
+
 | Parameter | Value | Description |
 |-----------|-------|-------------|
 | Port | 35000 | Server listening port |
-| Static Files Directory | `src/main/resources/static` | Root directory for static files |
+| Static Directory | `/static` | Root directory for static files |
 | Connection Type | Sequential | Handles one request at a time |
+| Cache | In-memory | Stores files in memory for better performance |
 
-
-### Web Demo
+### Demo Web Interface
 
 The application includes a complete interface with:
 
@@ -124,60 +209,198 @@ The application includes a complete interface with:
 
 ## 🧪 Tests
 
+### Run All Tests
+
 ```bash
 mvn test
 ```
 
-Results:
+### Expected Results
 
-```bash
+```text
 [INFO] -------------------------------------------------------
-[INFO]  T E S T S
+[INFO] T E S T S
 [INFO] -------------------------------------------------------
 [INFO] Running com.escuelaing.arep.HttpServerTest
-[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.065 s - in com.escuelaing.arep.HttpServerTest
-[INFO] 
-[INFO] Results:
-[INFO] 
 [INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0
-[INFO] 
-[INFO] ------------------------------------------------------------------------
+[INFO]
+[INFO] Results:
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time:  1.417 s
-[INFO] Finished at: 2025-08-18T19:17:43-05:00
-[INFO] ------------------------------------------------------------------------
 ```
+
+### Test Coverage
 
 Tests include:
 
 - HTTP server unit tests
 - MIME type validation
 - REST endpoint testing
-- Error and edge case handling
+- Error handling and edge cases
+- Query parameter validation
+- JSON responses and status codes
 
-## 📦 Project Structure
+## 📦 Technologies and Dependencies
 
+- **Java 21**: Base language with modern features
+- **Maven 3.9+**: Dependency management and building
+- **JUnit 5**: Testing framework
+- **Vanilla JavaScript**: Framework-free frontend
+- **CSS3**: Modern responsive styles
+- **Docker**: Containerization and deployment
+
+## 🐳 Deployment with Docker
+
+### Building the Image
+
+```bash
+# Building with Docker Compose (recommended)
+docker-compose up --build
+
+# Manual build
+docker build -t arep-taller-2 .
 ```
-src/
-├── main/java/com/escuelaing/arep/
-│ └── HttpServer.java # Main server
-├── main/resources/static/
-│ ├── index.html # Home Page
-│ ├── styles.css # Styles
-│ ├── app.js # Client-side Logic
-│ └── logo.svg # App Logo
-└── test/java/com/escuelaing/arep/
-└── HttpServerTest.java # Unit Tests
+
+### Dockerfile Features
+
+- **Multi-stage build**: Image size optimization
+- **Alpine Base**: Lightweight production image
+- **Standalone JAR**: No external dependencies
+- **Configured port**: Automatically exposes port 35000
+
+### Useful Docker Commands
+
+```bash
+# Run in background
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop services
+docker-compose down
+
+# Rebuild without cache
+docker-compose build --no-cache
 ```
 
-## 🛠️ Technologies
+## 📊 Metrics and Performance
 
-- **Java 21**: Core Language
-- **Maven**: Dependency Management and Building
-- **JUnit 5**: Testing Framework
-- **Vanilla JavaScript**: Framework-free Frontend
-- **CSS3**: Responsive Styles
+### Performance Features
+
+- **In-Memory Cache**: Static files cached for fast response
+- **Sequential Connections**: One request at a time (ideal for development/demo)
+- **Optimized Logging**: Logging system configured for debugging
+- **JAR Size**: ~10MB (no external dependencies)
+
+### Known Limitations
+
+- Sequential connection handling (non-concurrent)
+- Unlimited memory cache
+- No data persistence
+- No authentication/authorization
+
+## 🔍 Technical Details
+
+### Request Flow
+
+1. **Receive**: `HttpServer` receives the connection
+2. **Parsing**: Extracts method, route, and HTTP headers
+3. **Routing**: `WebApp` verifies registered routes
+4. **Processing**: Executes handler or serve a static file
+5. **Response**: Sends an HTTP response with appropriate headers
+
+### MIME Type Handling
+
+```java
+// Automatically supported MIME types
+.html/.htm → text/html
+.css → text/css
+.js → application/javascript
+.png → image/png
+.jpg/.jpeg → image/jpeg
+.svg → image/svg+xml
+// ... and more
+```
+
+### Advanced Configuration
+
+```java
+// Port Configuration
+ServerConfig.setPort(8080);
+
+// Static File Configuration
+staticfiles("/public");
+
+// Routes with multiple parameters
+get("/user", (req, resp) -> { 
+String name = req.getValues("name"); 
+String age = req.getValues("age"); 
+return "User: " + name + ", Age: " + age;
+});
+```
+
+## � Development and Contribution
+
+### Class Structure
+
+```text
+HttpServer (Core)
+├── TCP Connection Handling
+├── HTTP Parsing
+├── Static File Serving
+└── Framework Integration
+
+WebApp (Framework)
+├── Route Registration
+├── Handler Management
+├── Static Configuration
+└── Server Lifecycle
+
+Request/Response
+├── HTTP Encapsulation
+├── Parameter Parsing
+├── Header Configuration
+└── Content Types
+```
+
+## 🚨 Troubleshooting
+
+### Common Problems
+
+#### Port in use
+
+```bash
+# Check processes on port 35000
+lsof -i :35000
+kill -9 <PID>
+```
+
+#### Compilation Errors
+
+```bash
+# Clean and recompile
+mvn clean install
+```
+
+#### Docker Problems
+
+```bash
+# Clean containers
+docker system prune -a
+```
+
+### Debug Logs
+
+The server includes detailed debugging logs:
+
+```text
+INFO: HTTP Server started on port 35000
+INFO: Serving files from: /path/to/static
+INFO: Request: GET /App/hello?name=Diego
+INFO: Framework route handled: /App/hello
+```
 
 ## 👨‍💻 Author
 
@@ -187,7 +410,15 @@ src/
 
 This project is licensed under the MIT License - see [LICENSE.md](LICENSE.md) for details.
 
----
+## 🎓 Academic Context
 
 **Julio Garavito Colombian School of Engineering**
-**Enterprise Architectures (AREP) - Workshop 1**
+**Enterprise Architectures (AREP) - Workshop 2**
+
+### Learning Objectives
+
+- Implementing HTTP servers from scratch
+- Developing minimalist web frameworks
+- Handling network protocols in Java
+- Containerization with Docker
+- Distributed architectures and microservices
