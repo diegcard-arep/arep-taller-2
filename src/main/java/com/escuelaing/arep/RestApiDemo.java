@@ -7,11 +7,11 @@ import static com.escuelaing.arep.WebApp.start;
 import static com.escuelaing.arep.WebApp.staticfiles;
 
 /**
- * Example application demonstrating how to use the web framework.
- * This class shows how to define REST services using lambda functions,
- * extract query parameters, and configure static file locations.
+ * Web framework demonstration application showcasing REST API capabilities.
+ * This application demonstrates how to build REST services using lambda functions,
+ * handle query parameters, and serve static content through the framework.
  * 
- * The example serves:
+ * The application provides:
  * - http://localhost:35000/App/hello?name=Pedro - Returns personalized greeting
  * - http://localhost:35000/App/pi - Returns the value of PI
  * - http://localhost:35000/index.html - Serves static files from /webroot
@@ -19,7 +19,7 @@ import static com.escuelaing.arep.WebApp.staticfiles;
  * @author Diego Cardenas
  * @version 1.0
  */
-public class ExampleApp {
+public class RestApiDemo {
     
     /**
      * Main method demonstrating the framework usage.
@@ -99,8 +99,8 @@ public class ExampleApp {
                 """, java.time.Instant.now().toString());
         });
         
-        // Start the web application
-        System.out.println("Starting Example Web Application...");
+        // Start the REST API application
+        System.out.println("Starting REST API Demo Application...");
         System.out.println("Available endpoints:");
         System.out.println("  - http://localhost:" + port + "/App/hello?name=Pedro");
         System.out.println("  - http://localhost:" + port + "/App/pi");
