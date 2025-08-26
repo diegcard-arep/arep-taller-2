@@ -2,7 +2,9 @@ package com.escuelaing.arep;
 
 import java.io.IOException;
 
-import static com.escuelaing.arep.WebApp.*;
+import static com.escuelaing.arep.WebApp.get;
+import static com.escuelaing.arep.WebApp.start;
+import static com.escuelaing.arep.WebApp.staticfiles;
 
 /**
  * Example application demonstrating how to use the web framework.
@@ -23,10 +25,28 @@ public class ExampleApp {
      * Main method demonstrating the framework usage.
      * Sets up static file serving and defines REST service endpoints.
      * 
-     * @param args command line arguments (not used)
+     * @param args command line arguments. First argument can be the port number.
      * @throws IOException if the server fails to start
      */
     public static void main(String[] args) throws IOException {
+        // Parse port from command line arguments if provided
+        int port = 35000; // default port
+        if (args.length > 0) {
+            try {
+                port = Integer.parseInt(args[0]);
+                if (port < 1 || port > 65535) {
+                    System.err.println("Error: Port must be between 1 and 65535");
+                    System.exit(1);
+                }
+            } catch (NumberFormatException e) {
+                System.err.println("Error: Invalid port number '" + args[0] + "'. Using default port 35000.");
+                port = 35000;
+            }
+        }
+        
+        // Set the port in ServerConfig
+        com.escuelaing.arep.config.ServerConfig.setPort(port);
+        
         // Configure static files location
         staticfiles("/static");
         
@@ -82,11 +102,11 @@ public class ExampleApp {
         // Start the web application
         System.out.println("Starting Example Web Application...");
         System.out.println("Available endpoints:");
-        System.out.println("  - http://localhost:35000/App/hello?name=Pedro");
-        System.out.println("  - http://localhost:35000/App/pi");
-        System.out.println("  - http://localhost:35000/App/greet?name=Maria&lang=es");
-        System.out.println("  - http://localhost:35000/App/info");
-        System.out.println("  - http://localhost:35000/index.html (static files)");
+        System.out.println("  - http://localhost:" + port + "/App/hello?name=Pedro");
+        System.out.println("  - http://localhost:" + port + "/App/pi");
+        System.out.println("  - http://localhost:" + port + "/App/greet?name=Maria&lang=es");
+        System.out.println("  - http://localhost:" + port + "/App/info");
+        System.out.println("  - http://localhost:" + port + "/index.html (static files)");
         System.out.println("");
         
         start();

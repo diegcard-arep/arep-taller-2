@@ -67,10 +67,10 @@ public class HttpServer {
      *                     socket.
      */
     public void start() throws IOException {
-        try (ServerSocket serverSocket = new ServerSocket(ServerConfig.PORT)) {
-            LOGGER.log(Level.INFO, "HTTP Server started on port {0}", ServerConfig.PORT);
+        try (ServerSocket serverSocket = new ServerSocket(ServerConfig.getPort())) {
+            LOGGER.log(Level.INFO, "HTTP Server started on port {0}", ServerConfig.getPort());
             LOGGER.log(Level.INFO, "Serving files from: {0}", WEB_ROOT);
-            LOGGER.log(Level.INFO, "Open http://localhost:{0} in your browser", ServerConfig.PORT);
+            LOGGER.log(Level.INFO, "Open http://localhost:{0} in your browser", ServerConfig.getPort());
 
             while (running) {
                 LOGGER.log(Level.INFO, "Waiting for client connection...");
@@ -82,7 +82,7 @@ public class HttpServer {
                 }
             }
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Could not start server on port: {0}", ServerConfig.PORT);
+            LOGGER.log(Level.SEVERE, "Could not start server on port: {0}", ServerConfig.getPort());
             LOGGER.log(Level.SEVERE, "Error: {0}", e.getMessage());
         } finally {
             LOGGER.log(Level.INFO, "Server stopped.");
